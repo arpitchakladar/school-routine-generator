@@ -6,6 +6,7 @@ routine = [[]]
 subject = []
 max_classes = 0
 periods = 0
+days = len(week_days)
 
 def display_table_bar(start, end, column_widths, sep):
 	print(start, end="")
@@ -45,19 +46,21 @@ def display_table(headings, data):
 	display_table_bar("└", "┘", column_widths, "┴")
 
 def generate_routine():
-	days = len(week_days)
-	global routine
-	routine = []
 	used = {}
 	for name, _, n in subjects:
 		used[name] = n
+		if n > max_classes * days:
+			return False
+	global routine
+	routine = []
+
 	for d in range(days):
 		l = []
 		if d == 4:
 			for u in used.values():
 				if u > max_classes:
-					generate_routine()
-					return
+					return generate_routine()
+
 		for p in range(periods):
 			sub = None
 			while True:
@@ -77,10 +80,9 @@ def generate_routine():
 			l.append(sub[0] + " (" + teacher + ")")
 			used[sub[0]] -= 1
 		routine.append(l)
+	return True
 
 def substitution(day, teacher):
-	periods = len(routine[day])
-	days = len(routine)
 	for i in range(periods):
 		clas = routine[day][i]
 		x = clas.rfind("(")
@@ -142,8 +144,6 @@ def change_class(day, period, subject, teacher):
 
 # Format of subjects is (subject name, number of classes in a week)
 def display_routine():
-	days = len(routine)
-	periods = len(routine[0])
 	x = list(routine)
 	for i in range(days):
 		x[i] = [week_days[i]] + x[i]
@@ -190,16 +190,18 @@ Enter your choice : """))
 				classes = 0
 				while True:
 					classes = int(input("\t\t└ Enter number of classes in a week  : "))
-					if classes > max_classes * 5:
-						print("┌────────────────────┐")
-						print("│ Too many classes.  │")
-						print("└────────────────────┘")
+					if classes > max_classes * days:
+						print("\t\t┌────────────────────┐")
+						print("\t\t│ Too many classes.  │")
+						print("\t\t└────────────────────┘")
 					else:
 						break
 				total_classes += classes
 				subjects.append([subject.upper().strip(), teachers, classes])
-			if periods * 5 != total_classes:
-				print("Total number of classes and total number of classes assigned to each subject are not equal.")
+			if periods * days != total_classes:
+				print("\t┌─────────────────────────────────────────────────────────────────────────────────────────────┐")
+				print("\t│ Total number of classes and total number of classes assigned to each subject are not equal. │")
+				print("\t└─────────────────────────────────────────────────────────────────────────────────────────────┘")
 				continue
 			generate_routine()
 			display_routine()
@@ -267,8 +269,12 @@ Enter your choice : """))
 			display_routine()
 
 		elif option == 7:
-			generate_routine()
-			display_routine()
+			if generate_routine():
+				display_routine()
+			else:
+				print("┌───────────────────────────────────────────────────────────────────────────────┐")
+				print("│ There are too many classes to maintain the maximum number of classes in a day │")
+				print("└───────────────────────────────────────────────────────────────────────────────┘")
 
 		elif option == 8:
 			break
