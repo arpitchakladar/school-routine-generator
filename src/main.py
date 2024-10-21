@@ -1,4 +1,6 @@
 from random import randint
+from table import display_table
+from db import create_tables, close_db, create_routine, create_period
 
 week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
@@ -8,42 +10,7 @@ max_classes = 0
 periods = 0
 days = len(week_days)
 
-def display_table_bar(start, end, column_widths, sep):
-	print(start, end="")
-	for w in column_widths[:-1]:
-		print("─" * (w + 2), end=sep)
-	print("─" * (column_widths[-1] + 2) + end)
-
-def display_table(headings, data):
-	column_names = []
-	for i in range(len(headings)):
-		column_names.append(str(headings[i]))
-
-	column_widths = []
-	for i in range(len(column_names)):
-		m = len(column_names[i])
-		for j in range(len(data)):
-			m1 = len(str(data[j][i]))
-			if m1 > m:
-				m = m1
-		column_widths.append(m)
-
-	display_table_bar("┌", "┐", column_widths, "┬")
-	print("│ ", end="")
-	for i in range(len(column_names)):
-		column = column_names[i]
-		print(column, " " * (column_widths[i] - len(column)), end="│ ")
-	print("")
-
-	display_table_bar("├", "┤", column_widths, "┼")
-
-	for row in data:
-		print("│ ", end="")
-		for i in range(len(row)):
-			x = str(row[i])
-			print(x, " " * (column_widths[i] - len(x)), end="│ ")
-		print()
-	display_table_bar("└", "┘", column_widths, "┴")
+create_tables()
 
 def generate_routine():
 	used = {}
@@ -175,8 +142,10 @@ Enter your choice : """))
 			print("└───────────────────┘")
 			subjects = []
 			total_classes = 0
+			class_name = input("\t└ Enter class : ")
 			periods = int(input("\t└ Enter number of periods in a day : "))
 			max_classes = int(input("\t└ Enter maximum number of classes in a day per subject : "))
+			create_routine(class_name, max_classes)
 			while True:
 				subject = input("\t└ Enter subject (leave empty to finish) : ")
 				if not subject:
@@ -205,6 +174,11 @@ Enter your choice : """))
 				continue
 			generate_routine()
 			display_routine()
+			i = 0
+			for i in range(len(routine)):
+				d = routine[i]
+				for j in range(len(d)):
+					create_period(week_days[i], j + 1, class_name, d[j])
 
 		elif option == 2:
 			if routine[0]:
@@ -283,8 +257,9 @@ Enter your choice : """))
 			raise Exception()
 
 	except Exception as e:
-		#print(e)
+		print(e)
 		print("┌────────────────┐")
 		print("│ Invalid Option │")
 		print("└────────────────┘")
 
+close_db()
