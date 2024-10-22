@@ -1,16 +1,13 @@
 from random import randint
 from table import display_table
-from db import create_tables, close_db, create_routine, create_period
-
-week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+from db import close_db, create_routine, display_routine
+from const import week_days
 
 routine = [[]]
 subject = []
 max_classes = 0
 periods = 0
 days = len(week_days)
-
-create_tables()
 
 def generate_routine():
 	used = {}
@@ -109,16 +106,6 @@ def change_class(day, period, subject, teacher):
 	except ValueError:
 		pass
 
-# Format of subjects is (subject name, number of classes in a week)
-def display_routine():
-	x = list(routine)
-	for i in range(days):
-		x[i] = [week_days[i]] + x[i]
-	headings = ["Days"]
-	for i in range(1, periods + 1):
-		headings.append("Period " + str(i))
-	display_table(headings, x)
-
 while True:
 	try:
 		option = int(input("""
@@ -145,7 +132,6 @@ Enter your choice : """))
 			class_name = input("\t└ Enter class : ")
 			periods = int(input("\t└ Enter number of periods in a day : "))
 			max_classes = int(input("\t└ Enter maximum number of classes in a day per subject : "))
-			create_routine(class_name, max_classes)
 			while True:
 				subject = input("\t└ Enter subject (leave empty to finish) : ")
 				if not subject:
@@ -173,16 +159,14 @@ Enter your choice : """))
 				print("\t└─────────────────────────────────────────────────────────────────────────────────────────────┘")
 				continue
 			generate_routine()
-			display_routine()
-			i = 0
-			for i in range(len(routine)):
-				d = routine[i]
-				for j in range(len(d)):
-					create_period(week_days[i], j + 1, class_name, d[j])
+
+			create_routine(class_name, routine)
+
+			display_routine(class_name)
 
 		elif option == 2:
-			if routine[0]:
-				display_routine()
+			if routine[0] or True:
+				display_routine("12A01")
 			else:
 				print("")
 				print("┌─────────────┐")

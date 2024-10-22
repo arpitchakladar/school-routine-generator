@@ -33,25 +33,6 @@
 				fi
 
 				mkdir -p /tmp/school-routine-generator/mysql/run
-
-				# Create a my.cnf config file to disable Unix socket and enable networking
-				echo "Writing my.cnf to disable Unix socket..."
-				cat > ./mysql/my.cnf <<EOF
-[mysqld]
-bind-address = 0.0.0.0
-skip-networking = 0
-skip-external-locking
-skip-grant-tables
-socket = /tmp/school-routine-generator/mysql/run/socket
-EOF
-
-				# Start MariaDB server with custom configuration file
-				echo "Starting MariaDB server with network-only configuration..."
-				mysqld --defaults-file=./mysql/my.cnf --datadir=./mysql/data &
-				MYSQL_PID=$!
-
-				# Stop MariaDB when exiting shell
-				trap "echo 'Stopping MariaDB server...'; kill $MYSQL_PID" EXIT
 			'';
 		};
 	};
