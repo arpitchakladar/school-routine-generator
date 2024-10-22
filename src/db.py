@@ -41,19 +41,18 @@ def display_routine(class_name):
 		SELECT {", ".join(week_days)}
 		FROM Routine{class_name};
 	""");
-	l = cur.fetchall()
+	l = list(cur.fetchall())
 	x = []
 	for i in range(len(l[0])):
 		k = []
 		for j in range(len(l)):
-			l.append(l[j][i])
+			k.append(l[j][i])
 		x.append(k)
 
-	print(x)
-
+	periods = len(l)
 	for i in range(len(week_days)):
 		x[i] = [week_days[i]] + x[i]
 	headings = ["Days"]
 	for i in range(1, periods + 1):
-		headings.append("Period " + str(i))
+		headings.append(f"Period {i}")
 	display_table(headings, x)
