@@ -10,9 +10,12 @@ cnx = mysql.connector.connect(
 
 cur = cnx.cursor()
 
+def class_name_routine_table(class_name):
+	return f"Routine{class_name.upper()}"
+
 def create_table(class_name):
 	cur.execute(f"""
-		CREATE TABLE IF NOT EXISTS Routine{class_name} (
+		CREATE TABLE IF NOT EXISTS {class_name_routine_table(class_name)} (
 			{" VARCHAR(100) NOT NULL, ".join(week_days)} VARCHAR(100) NOT NULL,
 			PRIMARY KEY ({", ".join(week_days)})
 		);
@@ -29,7 +32,7 @@ def create_routine(class_name, routine):
 		for j in range(1, len(week_days)):
 			s += f", \"{routine[j][i]}\""
 		cur.execute(f"""
-			INSERT INTO Routine{class_name} (
+			INSERT INTO {class_name_routine_table(class_name)} (
 				{", ".join(week_days)}
 			) VALUES ({s});
 		""");
@@ -39,7 +42,7 @@ def create_routine(class_name, routine):
 def display_routine(class_name):
 	cur.execute(f"""
 		SELECT {", ".join(week_days)}
-		FROM Routine{class_name};
+		FROM {class_name_routine_table(class_name)};
 	""");
 	l = list(cur.fetchall())
 	x = []

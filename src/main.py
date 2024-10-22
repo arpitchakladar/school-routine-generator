@@ -114,12 +114,7 @@ while True:
 ├────────────────────────────┤
 │1. Generate New routine     │
 │2. Show routine             │
-│3. Show subjects details    │
-│4. Add substitution         │
-│5. Swap classes             │
-│6. Change class             │
-│7. Regenerate routine       │
-│8. Stop                     │
+│3. Stop                     │
 └────────────────────────────┘
 Enter your choice : """))
 		print("")
@@ -159,82 +154,14 @@ Enter your choice : """))
 				print("\t└─────────────────────────────────────────────────────────────────────────────────────────────┘")
 				continue
 			generate_routine()
-
 			create_routine(class_name, routine)
-
 			display_routine(class_name)
 
 		elif option == 2:
-			if routine[0] or True:
-				display_routine("12A01")
-			else:
-				print("")
-				print("┌─────────────┐")
-				print("│ No routine  │")
-				print("└─────────────┘")
-
+			class_name = input("\t└ Enter class : ")
+			display_routine(class_name)
+	
 		elif option == 3:
-			headings = ("Subjects",)
-			l = 0
-			for subject in subjects:
-				headings += (subject[0] + " (" + str(subject[2]) + " Classes)",)
-				l = max(l, len(subject[1]))
-			k = len(subjects)
-			teachers = []
-			for i in range(l):
-				row = [""]
-				if i == (l - 1) // 2:
-					row = ["Teachers"]
-				for j in range(k):
-					subject_teachers = subjects[j][1]
-					if i < len(subject_teachers):
-						row.append(subject_teachers[i])
-					else:
-						row.append("")
-				teachers.append(row)
-			display_table(headings, teachers)
-
-		elif option == 4:
-			print("┌─────────────────────┐")
-			print("│ Adding Substitution │")
-			print("└─────────────────────┘")
-			day = input("\t└ Enter day to substitute : ").strip().upper()
-			d = 0
-			for i in range(len(week_days)):
-				if day == week_days[i].upper():
-					d = i
-			teacher = input("\t└ Enter name of teacher to substitute : ").upper().strip()
-			substitution(d, teacher)
-			display_routine()
-
-		elif option == 5:
-			print("┌─────────────────────┐")
-			print("│ Swap classes        │")
-			print("└─────────────────────┘")
-			day1, period1 = input("\t└ Enter class to swap (format day,period): ").replace(" ", "").split(",")
-			day2, period2 = input("\t└ Enter class to swap with (format day,period): ").replace(" ", "").split(",")
-			swap_classes(day1, int(period1) - 1, day2, int(period2) - 1)
-			display_routine()
-
-		elif option == 6:
-			print("┌─────────────────────┐")
-			print("│ Change Class        │")
-			print("└─────────────────────┘")
-			day, period = input("\t└ Enter class to change (format day,period): ").replace(" ", "").split(",")
-			subject = input("\t└ Enter subject: ")
-			teacher = input("\t└ Enter teacher: ")
-			change_class(day, int(period) - 1, subject.upper().strip(), teacher.upper().strip())
-			display_routine()
-
-		elif option == 7:
-			if generate_routine():
-				display_routine()
-			else:
-				print("┌───────────────────────────────────────────────────────────────────────────────┐")
-				print("│ There are too many classes to maintain the maximum number of classes in a day │")
-				print("└───────────────────────────────────────────────────────────────────────────────┘")
-
-		elif option == 8:
 			break
 
 		else:
