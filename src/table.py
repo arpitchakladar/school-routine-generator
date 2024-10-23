@@ -1,36 +1,35 @@
-def _display_table_bar(start, end, column_widths, sep):
-	print(start, end="")
-	for w in column_widths[:-1]:
-		print("─" * (w + 2), end=sep)
-	print("─" * (column_widths[-1] + 2) + end)
+def _display_table_border(start_char, end_char, column_widths, separator):
+	print(start_char, end="")
+	for width in column_widths[:-1]:
+		print("─" * (width + 2), end=separator)
+	print("─" * (column_widths[-1] + 2) + end_char)
 
-def display_table(headings, data):
-	column_names = []
-	for i in range(len(headings)):
-		column_names.append(str(headings[i]))
+
+def display_table(headers, rows):
+	header_names = [str(header) for header in headers]
 
 	column_widths = []
-	for i in range(len(column_names)):
-		m = len(column_names[i])
-		for j in range(len(data)):
-			m1 = len(str(data[j][i]))
-			if m1 > m:
-				m = m1
-		column_widths.append(m)
+	for col_index in range(len(header_names)):
+		max_width = len(header_names[col_index])
+		for row in rows:
+			cell_width = len(str(row[col_index]))
+			if cell_width > max_width:
+				max_width = cell_width
+		column_widths.append(max_width)
 
-	_display_table_bar("┌", "┐", column_widths, "┬")
+	_display_table_border("┌", "┐", column_widths, "┬")
 	print("│ ", end="")
-	for i in range(len(column_names)):
-		column = column_names[i]
-		print(column, " " * (column_widths[i] - len(column)), end="│ ")
-	print("")
+	for col_index, header in enumerate(header_names):
+		print(header, " " * (column_widths[col_index] - len(header)), end="│ ")
+	print()
 
-	_display_table_bar("├", "┤", column_widths, "┼")
+	_display_table_border("├", "┤", column_widths, "┼")
 
-	for row in data:
+	for row in rows:
 		print("│ ", end="")
-		for i in range(len(row)):
-			x = str(row[i])
-			print(x, " " * (column_widths[i] - len(x)), end="│ ")
+		for col_index, cell in enumerate(row):
+			cell_str = str(cell)
+			print(cell_str, " " * (column_widths[col_index] - len(cell_str)), end="│ ")
 		print()
-	_display_table_bar("└", "┘", column_widths, "┴")
+
+	_display_table_border("└", "┘", column_widths, "┴")

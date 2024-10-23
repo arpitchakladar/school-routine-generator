@@ -1,81 +1,83 @@
-import mysql.connector
-
+import mysql.connector as msc
 from utils import *
 from table import *
 
-cnx = mysql.connector.connect(
+# Establishing connection to the database
+_db_connection = msc.connect(
 	host="localhost",
 	user="root",
 	database="SchoolRoutine",
 )
+_db_cursor = _db_connection.cursor()
 
-cur = cnx.cursor()
 
-def _get_class_name_routine_table(class_name):
-	return f"Routine{class_name.upper()}"
+def get_routine_table_name(class_name):
+	return f"Routine_{class_name.upper().replace(" ", "_")}"
 
-def create_table(class_name):
-	cur.execute(f"""
-		CREATE TABLE IF NOT EXISTS {_get_class_name_routine_table(class_name)} (
-			{" VARCHAR(100) NOT NULL, ".join(week_days)} VARCHAR(100) NOT NULL,
-			PRIMARY KEY ({", ".join(week_days)})
-		);
-	""")
 
-def close_db():
-	cur.close()
-	cnx.close()
+def _create_routine_table(class_name):
+	try:
+		table_name = get_routine_table_name(class_name)
+		_db_cursor.execute(f"""
+			CREATE TABLE {table_name} (
+				{" VARCHAR(100) NOT NULL, ".join(week_days)} VARCHAR(100) NOT NULL,
+				PRIMARY KEY ({", ".join(week_days)})
+			);
+		""")
+		return True
+	except msc.Error as error:
+		if error.errno == msc.errorcode.ER_TABLE_EXISTS_ERROR:
+			return False
 
-def delete_routine(class_name):
-	cur.execute(f"""
-		DROP TABLE {_get_class_name_routine_table(class_name)};
-	""");
 
-def create_routine(class_name, routine):
-	create_table(class_name)
-	for i in range(len(routine[0])):
-		s = f"\"{routine[0][i]}\""
-		for j in range(1, len(week_days)):
-			s += f", \"{routine[j][i]}\""
+def close_database():
+	_db_cursor.close()
+	_db_connection.close()
 
-		cur.execute(f"""
-			INSERT INTO {_get_class_name_routine_table(class_name)} (
+
+def delete_class_routine(class_name):
+	try:
+		table_name = get_routine_table_name(class_name)
+		_db_cursor.execute(f"DROP TABLE {table_name};")
+		return True
+
+	except msc.Error as error:
+		if error.errno == msc.errorcode.ER_BAD_TABLE_ERROR:
+			return False
+
+
+def insert_class_routine(class_name, routine):
+	if not _create_routine_table(class_name):
+		return False
+
+	table_name = get_routine_table_name(class_name)
+	for row_index in range(len(routine[0])):
+		routine_row = f'"{routine[0][row_index]}"'
+		for day_index in range(1, len(week_days)):
+			routine_row += f', "{routine[day_index][row_index]}"'
+		_db_cursor.execute(f"""
+			INSERT INTO {table_name} (
 				{", ".join(week_days)}
-			) VALUES ({s});
-		""");
+			) VALUES ({routine_row});
+		""")
+	_db_connection.commit()
+	return True
 
-	cnx.commit()
+def get_class_names():
+	_db_cursor.execute("SHOW TABLES;")
+	class_names = []
+	for table in _db_cursor.fetchall():
+		class_names.append((table[0][8:].replace("_", " "),))
+	return class_names
 
-# Format of subjects is (subject name, number of classes in a week)
-def display_routine(class_name):
-	cur.execute(f"""
-		SELECT {", ".join(week_days)}
-		FROM {_get_class_name_routine_table(class_name)};
-	""");
-	l = list(cur.fetchall())
-	x = []
+def get_routine(class_name):
+	try:
+		_db_cursor.execute(f"""
+			SELECT {", ".join(week_days)}
+			FROM {get_routine_table_name(class_name)};
+		""")
+		return _db_cursor.fetchall()
 
-	for i in range(len(l[0])):
-		k = []
-		for j in range(len(l)):
-			k.append(l[j][i])
-		x.append(k)
-
-	periods = len(l)
-	for i in range(len(week_days)):
-		x[i] = [week_days[i]] + x[i]
-	headings = ["Days"]
-
-	for i in range(1, periods + 1):
-		headings.append(f"Period {i}")
-
-	display_table(headings, x)
-
-def list_classes():
-	cur.execute("SHOW TABLES;");
-
-	l = []
-	for e in cur.fetchall():
-		l.append((e[0][7:],))
-
-	display_table(["Classes"], l)
+	except msc.Error as error:
+		if error.errno == msc.errorcode.ER_NO_SUCH_TABLE:
+			return False

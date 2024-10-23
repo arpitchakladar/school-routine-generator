@@ -1,84 +1,121 @@
 from random import randint
-
 from utils import *
 from table import *
 from db import *
 
-def _generate_routine(subjects, periods, max_classes):
-	used = {}
-	for name, _, n in subjects:
-		used[name] = n
-		if n > max_classes * days:
+
+def _generate_class_routine(subjects, periods_per_day, max_subject_periods):
+	subject_periods_left = {}
+	for name, _, period_count in subjects:
+		subject_periods_left[name] = period_count
+	
+	for subject_name, _, period_count in subjects:
+		if period_count > max_subject_periods * days_per_week:
 			return []
+	
 	routine = []
 
-	for d in range(days):
-		l = []
-		if d == 4:
-			for u in used.values():
-				if u > max_classes:
-					return _generate_routine(subjects, periods, max_classes)
+	for day in range(days_per_week):
+		daily_schedule = []
 
-		for p in range(periods):
-			sub = None
+		if day == 4:
+			for periods_left in subject_periods_left.values():
+				if periods_left > max_subject_periods:
+					return _generate_class_routine(subjects, periods_per_day, max_subject_periods)
+
+		for period in range(periods_per_day):
+			subject = None
 			while True:
-				x = randint(0, len(subjects) - 1)
-				sub = subjects[x]
-				if used[sub[0]] > 0:
-					c = 0
-					for clas in l:
-						p = clas.rfind("(")
-						subject = clas[:p-1]
-						if subject == sub[0]:
-							c += 1
-					if c < max_classes:
+				subject_index = randint(0, len(subjects) - 1)
+				subject = subjects[subject_index]
+				subject_name = subject[0]
+				
+				if subject_periods_left[subject_name] > 0:
+					period_count = 0
+					for scheduled_class in daily_schedule:
+						if scheduled_class.startswith(subject_name):
+							period_count += 1
+					if period_count < max_subject_periods:
 						break
-			teachers = sub[1]
-			teacher = teachers[randint(0, len(teachers) - 1)]
-			l.append(sub[0] + " (" + teacher + ")")
-			used[sub[0]] -= 1
-		routine.append(l)
+
+			teacher_list = subject[1]
+			teacher = teacher_list[randint(0, len(teacher_list) - 1)]
+			daily_schedule.append(f"{subject_name} ({teacher})")
+			subject_periods_left[subject_name] -= 1
+
+		routine.append(daily_schedule)
 	return routine
+
 
 def generate_routine():
 	subjects = []
-	total_classes = 0
-	class_name = input("\t└ Enter class : ")
-	periods = int(input("\t└ Enter number of periods in a day : "))
-	max_classes = int(input("\t└ Enter maximum number of classes in a day per subject : "))
-	total_possible_classes = periods * days
-
+	total_periods_scheduled = 0
+	class_name = input("\t└ Enter class name: ")
+	periods_per_day = int(input("\t└ Enter number of periods per day: "))
+	max_subject_periods = int(input("\t└ Enter maximum periods per subject per day: "))
+	total_weekly_periods = periods_per_day * days_per_week
 	while True:
-		subject = input("\t└ Enter subject : ")
-		if not subject:
+		subject_name = input("\t└ Enter subject name: ").upper().strip()
+		if not subject_name:
 			break
-
 		teachers = []
 		while True:
-			teacher = input("\t\t└ Enter teacher (leave empty to finish) : ")
-			if not teacher:
+			teacher_name = input("\t\t└ Enter teacher name (leave empty to finish): ").upper().strip()
+			if not teacher_name:
 				break
-			teachers.append(teacher.upper().strip())
-
-		classes = 0
-
+			teachers.append(teacher_name)
 		while True:
-			classes = int(input("\t\t└ Enter number of classes in a week  : "))
-			if classes > max_classes * days:
-				display_message("Too many classes for a single subject in a week.", "\t\t")
-			elif classes + total_classes > total_possible_classes:
-				display_message(f"Only {total_possible_classes - total_classes} classes are left for the week.", "\t\t")
+			weekly_class_periods = int(input("\t\t└ Enter number of periods per week: "))
+			if weekly_class_periods > max_subject_periods * days_per_week:
+				display_message("Too many periods for a subject in a week.", "\t\t")
+			elif weekly_class_periods + total_periods_scheduled > total_weekly_periods:
+				display_message(
+					f"Only {total_weekly_periods - total_periods_scheduled} periods left for the week.",
+					"\t\t",
+				)
 			else:
 				break
-
-		total_classes += classes
-		subjects.append([subject.upper().strip(), teachers, classes])
-
-		if total_possible_classes == total_classes:
+		total_periods_scheduled += weekly_class_periods
+		subjects.append([subject_name, teachers, weekly_class_periods])
+		if total_weekly_periods == total_periods_scheduled:
 			break
 		else:
-			display_message(f"{total_possible_classes - total_classes} classes left for the week.", "\t")
+			display_message(
+				f"{total_weekly_periods - total_periods_scheduled} periods left for the week.",
+				"\t",
+			)
+	routine = _generate_class_routine(subjects, periods_per_day, max_subject_periods)
+	if insert_class_routine(class_name, routine):
+		display_routine(class_name)
+	else:
+		display_message(
+			f"Routine for class {class_name} already exists.",
+			"\t",
+		)
 
-	routine = _generate_routine(subjects, periods, max_classes)
-	create_routine(class_name, routine)
-	display_routine(class_name)
+
+def display_routine(class_name):
+	routine = get_routine(class_name)
+	if routine == False:
+		display_message(
+			f"Routine for class {class_name} not found.",
+			"\t",
+		)
+		return
+	formatted_routine = []
+	for i in range(len(week_days)):
+		routine_period = [week_days[i]]
+		for day_schedule in routine:
+			routine_period.append(day_schedule[i])
+		formatted_routine.append(routine_period)
+	headers = ["Days"]
+	for i in range(1, len(routine) + 1):
+		headers.append(f"Period {i}")
+	display_table(headers, formatted_routine)
+
+
+def list_classes():
+	class_names = get_class_names()
+	if len(class_names) == 0:
+		class_names = [["No classes"]]
+	display_table(["Classes"], class_names)
