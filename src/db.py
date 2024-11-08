@@ -2,6 +2,7 @@ import mysql.connector as msc
 from utils import *
 from table import *
 
+
 # Establishing connection to the database
 _db_connection = msc.connect(
 	host="localhost",

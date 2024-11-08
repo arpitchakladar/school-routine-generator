@@ -5,7 +5,6 @@ from routine import *
 
 while True:
 	try:
-		display_single_row_table("Options", menu_options)
 		user_choice = int(c_input(menu_prompt_message))
 
 		if user_choice == 1:
