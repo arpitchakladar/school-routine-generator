@@ -68,7 +68,7 @@ def get_class_names():
 	_db_cursor.execute("SHOW TABLES;")
 	class_names = []
 	for table in _db_cursor.fetchall():
-		class_names.append((table[0][8:].replace("_", " "),))
+		class_names.append(table[0][8:].replace("_", " "))
 	return class_names
 
 

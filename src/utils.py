@@ -1,19 +1,16 @@
 week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 days_per_week = len(week_days)
 
-menu_prompt_message = """
-┌─────────────────────────┐
-│ Options                 │
-├─────────────────────────┤
-│ 1  Create new routine   │
-│ 2  Show routine         │
-│ 3  Show all classes     │
-│ 4  Recreate routine     │
-│ 5  Delete routine       │
-│ 6  Stop                 │
-│ !  Cancel any operation │
-└─────────────────────────┘
-Enter your choice: """
+menu_options = [
+	"1  Create new routine",
+	"2  Show routine",
+	"3  Show all classes",
+	"4  Recreate routine",
+	"5  Delete routine",
+	"6  Stop",
+	"!  Cancel current operation",
+]
+menu_prompt_message = "Enter your choice: "
 
 
 def display_message(message, indent=""):
@@ -22,7 +19,8 @@ def display_message(message, indent=""):
 	print(indent + f"│ {message} │")
 	print(indent + "└" + dash_border + "┘")
 
-def cancelable_input(prompt):
+
+def c_input(prompt):
 	value = input(prompt)
 	if value.strip() == "!":
 		raise ValueError("Operation cancelled.")

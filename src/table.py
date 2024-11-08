@@ -44,3 +44,10 @@ def display_table(headers, rows, title = ""):
 		print()
 
 	_display_table_border("└", "┘", column_widths, "┴")
+
+
+def display_single_row_table(header, rows):
+	_rows = []
+	for row in rows:
+		_rows.append((row,))
+	display_table((header,), _rows)

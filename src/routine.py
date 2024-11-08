@@ -50,22 +50,22 @@ def _generate_class_routine(subjects, periods_per_day, max_subject_periods):
 def generate_routine():
 	subjects = []
 	total_periods_scheduled = 0
-	class_name = cancelable_input("\t└ Enter class name: ")
-	periods_per_day = int(cancelable_input("\t└ Enter number of periods per day: "))
-	max_subject_periods = int(cancelable_input("\t└ Enter maximum periods per subject per day: "))
+	class_name = c_input("\t└ Enter class name: ")
+	periods_per_day = int(c_input("\t└ Enter number of periods per day: "))
+	max_subject_periods = int(c_input("\t└ Enter maximum periods per subject per day: "))
 	total_weekly_periods = periods_per_day * days_per_week
 	while True:
-		subject_name = cancelable_input("\t└ Enter subject name: ").upper().strip()
+		subject_name = c_input("\t└ Enter subject name: ").upper().strip()
 		if not subject_name:
 			continue
 		teachers = []
 		while True:
-			teacher_name = cancelable_input("\t\t└ Enter teacher name (leave empty to finish): ").upper().strip()
+			teacher_name = c_input("\t\t└ Enter teacher name (leave empty to finish): ").upper().strip()
 			if not teacher_name:
 				break
 			teachers.append(teacher_name)
 		while True:
-			weekly_class_periods = int(cancelable_input("\t\t└ Enter number of periods per week: "))
+			weekly_class_periods = int(c_input("\t\t└ Enter number of periods per week: "))
 			if weekly_class_periods > max_subject_periods * days_per_week:
 				display_message("Too many periods for a subject in a week.", "\t\t")
 			elif weekly_class_periods + total_periods_scheduled > total_weekly_periods:
@@ -117,5 +117,5 @@ def display_routine(class_name):
 def list_classes():
 	class_names = get_class_names()
 	if len(class_names) == 0:
-		class_names = [["No classes"]]
-	display_table(["Classes"], class_names)
+		class_names = ["No classes"]
+	display_single_row_table("Classes", class_names)
