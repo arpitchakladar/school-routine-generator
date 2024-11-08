@@ -63,12 +63,14 @@ def insert_class_routine(class_name, routine):
 	_db_connection.commit()
 	return True
 
+
 def get_class_names():
 	_db_cursor.execute("SHOW TABLES;")
 	class_names = []
 	for table in _db_cursor.fetchall():
 		class_names.append((table[0][8:].replace("_", " "),))
 	return class_names
+
 
 def get_routine(class_name):
 	try:

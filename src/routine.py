@@ -57,7 +57,7 @@ def generate_routine():
 	while True:
 		subject_name = input("\t└ Enter subject name: ").upper().strip()
 		if not subject_name:
-			break
+			continue
 		teachers = []
 		while True:
 			teacher_name = input("\t\t└ Enter teacher name (leave empty to finish): ").upper().strip()
@@ -111,7 +111,7 @@ def display_routine(class_name):
 	headers = ["Days"]
 	for i in range(1, len(routine) + 1):
 		headers.append(f"Period {i}")
-	display_table(headers, formatted_routine)
+	display_table(headers, formatted_routine, "Routine of " + class_name.upper())
 
 
 def list_classes():
