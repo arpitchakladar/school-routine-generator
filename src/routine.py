@@ -12,7 +12,7 @@ def _generate_class_routine(subjects, periods_per_day, max_subject_periods):
 	for subject_name, _, period_count in subjects:
 		if period_count > max_subject_periods * days_per_week:
 			return []
-	
+
 	routine = []
 
 	for day in range(days_per_week):

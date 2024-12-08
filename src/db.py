@@ -13,7 +13,7 @@ _db_cursor = _db_connection.cursor()
 
 
 def get_routine_table_name(class_name):
-	return f"Routine_{class_name.upper().replace(" ", "_")}"
+	return f"Routine_{class_name.upper().replace(' ', '_')}"
 
 
 def _create_routine_table(class_name):

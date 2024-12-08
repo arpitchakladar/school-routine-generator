@@ -47,7 +47,7 @@ def display_table(headers, rows, title = ""):
 
 
 def display_single_row_table(header, rows):
-	_rows = []
+	table_rows = []
 	for row in rows:
-		_rows.append((row,))
-	display_table((header,), _rows)
+		table_rows.append((row,))
+	display_table((header,), table_rows)

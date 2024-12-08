@@ -46,7 +46,6 @@ while True:
 		display_message(str(e))
 
 	except Exception as e:
-		print(e)
 		display_message("Failed to process request.")
 
 
